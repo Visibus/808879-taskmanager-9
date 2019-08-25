@@ -127,5 +127,3 @@ loadButtonElement.addEventListener(`click`, () => {
   addMoreTasks();
   toogleLoadButton();
 });
-
-
