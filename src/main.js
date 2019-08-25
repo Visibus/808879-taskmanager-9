@@ -76,6 +76,7 @@ const boardElement = siteMainElement.querySelector(`.board`);
 renderComp(boardElement, createSortingTemplate(), `afterbegin`);
 
 const taskListElement = siteMainElement.querySelector(`.board__tasks`);
+
 loadTask().forEach((taskMock) => renderTask(taskMock));
 
 const mainFilterContainer = siteMainElement.querySelector(`.main__filter`);
