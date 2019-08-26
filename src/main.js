@@ -4,26 +4,58 @@ import {createFilterSection} from './components/filter-sec';
 import {createFilterTemplate} from './components/filter';
 import {createBoardTemplate} from './components/board';
 import {createSortingTemplate} from './components/sorting';
-import {createTaskTemplate} from './components/task';
-import {createTaskEditTemplate} from './components/task-edit';
+import {Task} from './components/task';
+import {TaskEdit} from './components/task-edit';
 import {createLoadMoreButtonTemplate} from './components/load-more-button';
 import {loadTask, taskFilters} from './components/data';
+import {render, unrender, Position} from './components/utils';
 
-
-const render = (container, template, place = `beforeend`) => {
+const renderComp = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
 };
 
-const QUANTITY_EDIT_TASK = 1;
+const renderTask = (taskMock) => {
+  const task = new Task(taskMock);
+  const taskEdit = new TaskEdit(taskMock);
 
-const renderTask = (container, tasks) => {
-  container.insertAdjacentHTML(`beforeend`, tasks
-  .slice(0, QUANTITY_EDIT_TASK)
-  .map(createTaskEditTemplate)
-  .join(``)
-  .concat(tasks
-  .map(createTaskTemplate)
-  .join(``)));
+  const onEscKeyDown = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      taskListElement.replaceChild(task.getElement(), taskEdit.getElement());
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  task.getElement()
+    .querySelector(`.card__btn--edit`)
+    .addEventListener(`click`, () => {
+      taskListElement.replaceChild(taskEdit.getElement(), task.getElement());
+      document.addEventListener(`keydown`, onEscKeyDown);
+    });
+
+  taskEdit.getElement().querySelector(`textarea`)
+    .addEventListener(`focus`, () => {
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+
+  taskEdit.getElement().querySelector(`textarea`)
+    .addEventListener(`blur`, () => {
+      document.addEventListener(`keydown`, onEscKeyDown);
+    });
+
+  taskEdit.getElement()
+    .querySelector(`.card__save`)
+    .addEventListener(`click`, () => {
+      taskListElement.replaceChild(task.getElement(), taskEdit.getElement());
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+
+  taskEdit.getElement().querySelector(`.card__delete`)
+    .addEventListener(`click`, () => {
+      unrender(taskEdit.getElement());
+      taskEdit.removeElement();
+    });
+
+  render(taskListElement, task.getElement(), Position.BEFOREEND);
 };
 
 const renderFilter = (container, tasks) => {
@@ -35,21 +67,22 @@ const renderFilter = (container, tasks) => {
 const siteMainElement = document.querySelector(`.main`);
 const siteHeaderElement = siteMainElement.querySelector(`.main__control`);
 
-render(siteHeaderElement, createSiteMenuTemplate());
-render(siteMainElement, createSearchTemplate());
-render(siteMainElement, createFilterSection());
-render(siteMainElement, createBoardTemplate());
+renderComp(siteHeaderElement, createSiteMenuTemplate());
+renderComp(siteMainElement, createSearchTemplate());
+renderComp(siteMainElement, createFilterSection());
+renderComp(siteMainElement, createBoardTemplate());
 
 const boardElement = siteMainElement.querySelector(`.board`);
+renderComp(boardElement, createSortingTemplate(), `afterbegin`);
+
 const taskListElement = siteMainElement.querySelector(`.board__tasks`);
 
-render(boardElement, createSortingTemplate(), `afterbegin`);
-renderTask(taskListElement, loadTask());
+loadTask().forEach((taskMock) => renderTask(taskMock));
 
 const mainFilterContainer = siteMainElement.querySelector(`.main__filter`);
 renderFilter(mainFilterContainer, taskFilters);
 
-render(boardElement, createLoadMoreButtonTemplate());
+renderComp(boardElement, createLoadMoreButtonTemplate());
 
 const tasksElement = () => Array.from(document.querySelectorAll(`article`));
 const loadButtonElement = document.querySelector(`.load-more`);
@@ -94,5 +127,3 @@ loadButtonElement.addEventListener(`click`, () => {
   addMoreTasks();
   toogleLoadButton();
 });
-
-
