@@ -9,6 +9,7 @@ import {TaskEdit} from './components/task-edit';
 import {createLoadMoreButtonTemplate} from './components/load-more-button';
 import {loadTask, taskFilters} from './components/data';
 import {render, unrender, Position} from './components/utils';
+import {NoTasks} from './components/no-tasks';
 
 const renderComp = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
@@ -127,3 +128,13 @@ loadButtonElement.addEventListener(`click`, () => {
   addMoreTasks();
   toogleLoadButton();
 });
+
+const archiveTasks = taskFilters.find((item) => item.title === `ARCHIVE`);
+if ((taskListElement.childElementCount === 0) || (archiveTasks && archiveTasks.count === taskListElement.childElementCount)) {
+  Array.from(boardElement.children).forEach((it) => {
+    unrender(it);
+  });
+  render(boardElement, new NoTasks().getElement(), Position.BEFOREEND);
+}
+
+
