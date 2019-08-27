@@ -1,7 +1,7 @@
 import {MILLISECONDS_IN_DAY, getRandElementFromArr, getRandSeveralElementsFromArr, getRandTime, getRandBoolean} from './utils';
 
 const COUNT_TAGS = 3;
-export const TASK_COUNT = 15;
+export const TASK_COUNT = 0;
 
 const arrDescription = [
   `Изучить теорию`,
