@@ -1,20 +1,13 @@
-import {createElement} from './utils';
+import {AbstractComponent} from './abstract-component';
 
-export class Task {
+export class Task extends AbstractComponent {
   constructor({description, dueDate, tags, color, repeatingDays}) {
+    super();
     this._description = description;
     this._dueDate = new Date(dueDate);
     this._tags = tags;
     this._color = color;
-    this._element = null;
     this._repeatingDays = repeatingDays;
-  }
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
   getTemplate() {
     return `<article class="card card--${this._color} ${Object.values(this._repeatingDays).some((it) => it === true) ? `card--repeat` : `` }">
